@@ -194,6 +194,7 @@ void server(kn::port_t port)
 
 void run(string name, string ip, kn::port_t port)
 {
+	name = name.substr(0, USERNAME);
 	tc::init();
 	tc::enable_raw_mode();
 	kn::tcp_socket sock;
@@ -205,9 +206,8 @@ void run(string name, string ip, kn::port_t port)
 	{
 		ClientMsg login = {};
 		login.kind = Login;
-		auto namelen = MIN(name.length(), USERNAME);
-		memcpy(login.name, name.c_str(), namelen);
-		login.namelen = namelen;
+		memcpy(login.name, name.c_str(), name.length());
+		login.namelen = name.length();
 		sock.send(bytecast(login), sizeof(login));
 	}
 	cout << "!> polaczenie z serwerem " << ip << ":" << port << " zostalo zawarte\n";
@@ -246,6 +246,7 @@ void run(string name, string ip, kn::port_t port)
 				sm.kind = Send;
 				sm.len = (int)s.size();
 				sm.namelen = name.length();
+				s = s.substr(0, MSG);
 				memcpy(sm.name, name.c_str(), name.length());
 				memcpy(sm.msg, s.data(), s.size());
 				sock.send(bytecast(sm), sizeof(sm));
